@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsCallback;
 import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
@@ -87,6 +88,7 @@ import org.sunbird.telemetry.TelemetryHandler;
 import org.sunbird.telemetry.TelemetryStageId;
 import org.sunbird.telemetry.enums.CoRelationIdContext;
 import org.sunbird.telemetry.enums.EntityType;
+import org.sunbird.ui.KeyCloakRequestActivity;
 import org.sunbird.ui.ListViewAdapter;
 import org.sunbird.ui.MainActivity;
 import org.sunbird.ui.MyRecyclerViewAdapter;
@@ -182,21 +184,34 @@ public class JsInterface {
         return arrayList;
     }
 
+    private static final String SERVICE_ACTION = "android.support.customtabs.action.CustomTabsService";
+    private static final String CHROME_PACKAGE = "com.android.chrome";
+
+    private static boolean isChromeCustomTabsSupported(@NonNull final Context context) {
+        Intent serviceIntent = new Intent(SERVICE_ACTION);
+        serviceIntent.setPackage(CHROME_PACKAGE);
+        List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentServices(serviceIntent, 0);
+        return !(resolveInfos == null || resolveInfos.isEmpty());
+    }
+
     @JavascriptInterface
     public void keyCloakLogin(final String OAUTH_URL, final String CLIENT_ID) {
-
         TelemetryHandler.saveTelemetry(TelemetryBuilder.buildGEInteract(InteractionType.TOUCH, TelemetryStageId.LOGIN, TelemetryAction.LOGIN_INITIATE, null, null));
-
-        CustomTabsIntent.Builder mBuilder = new CustomTabsIntent.Builder(getSession());
-        //mBuilder.setToolbarColor(.getColor(activity, R.color.colorPrimary));
-        CustomTabsIntent mIntent = mBuilder.build();
 
         String keyCloackAuthUrl = OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=code&scope=openid&client_id=" + CLIENT_ID + "&scope=openid";
 
         Log.e("URL HITTING:", keyCloackAuthUrl);
-        mIntent.intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-//        mIntent.intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-        mIntent.launchUrl(context, Uri.parse(keyCloackAuthUrl));
+
+        if (isChromeCustomTabsSupported(activity)) {
+            CustomTabsIntent.Builder mBuilder = new CustomTabsIntent.Builder(getSession());
+            CustomTabsIntent mIntent = mBuilder.build();
+            mIntent.intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            mIntent.launchUrl(context, Uri.parse(keyCloackAuthUrl));
+        } else {
+            Intent intent = new Intent(activity, KeyCloakRequestActivity.class);
+            intent.setData(Uri.parse(keyCloackAuthUrl));
+            activity.startActivity(intent);
+        }
 
         TelemetryHandler.saveTelemetry(TelemetryBuilder.buildGEInteract(TelemetryStageId.LOGIN));
     }

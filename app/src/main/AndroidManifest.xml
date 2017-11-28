@@ -10,14 +10,14 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:name="org.sunbird.GlobalApplication"
+        android:name=".GlobalApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:launchMode="singleTop"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="org.sunbird.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -28,7 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -39,24 +38,22 @@
                     android:host="@string/api_url"
                     android:pathPrefix="/public"
                     android:scheme="@string/deeplink_scheme_http" />
-
                 <data
                     android:host="@string/api_url"
                     android:pathPrefix="/public"
                     android:scheme="@string/deeplink_scheme_https" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="*"
                     android:mimeType="application/octet-stream"
                     android:pathPattern=".*\\.ecar" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -68,7 +65,6 @@
                     android:mimeType="application/ecar"
                     android:scheme="@string/deeplink_scheme_content" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -90,7 +86,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.sunbird.ui.KeyCloakResponseActivity"
+            android:name=".ui.KeyCloakResponseActivity"
             android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -110,25 +106,21 @@
             android:value="$YOUR_FABRIC_API_KEY$" />
 
         <provider
-            android:name="org.sunbird.providers.UserProvider"
+            android:name=".providers.UserProvider"
             android:authorities="${applicationId}.profiles"
             android:exported="true" />
-
         <provider
-            android:name="org.sunbird.providers.TelemetryProvider"
+            android:name=".providers.TelemetryProvider"
             android:authorities="${applicationId}.telemetry"
             android:exported="true" />
-
         <provider
-            android:name="org.sunbird.providers.PartnerProvider"
+            android:name=".providers.PartnerProvider"
             android:authorities="${applicationId}.partner"
             android:exported="true" />
-
         <provider
-            android:name="org.sunbird.providers.ContentProvider"
+            android:name=".providers.ContentProvider"
             android:authorities="${applicationId}.content"
             android:exported="true" />
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -152,6 +144,8 @@
 
         <!-- Notification service -->
         <service android:name=".notification.LocalNotificationService" />
+
+        <activity android:name=".ui.KeyCloakRequestActivity"></activity>
     </application>
 
 </manifest>
